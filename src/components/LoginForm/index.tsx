@@ -5,7 +5,9 @@ import { clsx } from 'clsx'
 import { useRouter } from 'next/navigation'
 import { FC } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { AuthService, TFormData } from 'service/auth.service'
+import { saveTokenStorage } from 'service/auth/auth.helper'
+import { AuthService } from 'service/auth/auth.service'
+import { TFormData } from 'service/auth/auth.types'
 
 import styles from './LoginForm.module.scss'
 
@@ -26,9 +28,9 @@ const LoginForm: FC<TLoginForm> = ({ isLogin }) => {
 
 	const { mutate: mutateLogin, isPending: isLoginPending } = useMutation({
 		mutationKey: ['login'],
-		mutationFn: (data: TFormData) => AuthService.login(data),
-		onSuccess(data) {
-			localStorage.setItem('token', data.accessToken)
+		mutationFn: (data: TFormData) => AuthService.main('login', data),
+		onSuccess({ data }) {
+			saveTokenStorage(data.accessToken)
 			reset()
 			push('/')
 		},
@@ -36,9 +38,9 @@ const LoginForm: FC<TLoginForm> = ({ isLogin }) => {
 
 	const { mutate: mutateRegister, isPending: isRegisterPending } = useMutation({
 		mutationKey: ['register'],
-		mutationFn: (data: TFormData) => AuthService.register(data),
-		onSuccess(data) {
-			localStorage.setItem('token', data.accessToken)
+		mutationFn: (data: TFormData) => AuthService.main('register', data),
+		onSuccess({ data }) {
+			saveTokenStorage(data.accessToken)
 			reset()
 			push('/')
 		},
